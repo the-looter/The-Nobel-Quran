@@ -1,0 +1,1470 @@
+<!DOCTYPE html>
+<html lang="en" dir="ltr">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>القرآن الكريم - The Noble Quran</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        :root {
+            --primary-gold: #d4af37;
+            --dark-green: #0d5e3a;
+            --light-cream: #f9f6f0;
+            --text-dark: #2c3e50;
+            --accent-teal: #1a7a6e;
+        }
+
+        body {
+            font-family: 'Times New Roman', serif;
+            font-weight: 600;
+            background: linear-gradient(135deg, var(--light-cream) 0%, #e8dcc4 100%);
+            color: var(--text-dark);
+            overflow-x: hidden;
+            position: relative;
+            min-height: 100vh;
+            transition: background 0.5s ease, color 0.5s ease;
+        }
+
+        /* Dark Theme */
+        body.dark-theme {
+            --light-cream: #1a1a1a;
+            --text-dark: #e0e0e0;
+            --dark-green: #5fb58a;
+            --accent-teal: #4ec9b0;
+            background: linear-gradient(135deg, #1a1a1a 0%, #2c2c2c 100%);
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .surah-card,
+        body.dark-theme .search-box,
+        body.dark-theme .modal-content,
+        body.dark-theme .hadith-content {
+            background: #2d2d2d;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .verse-container,
+        body.dark-theme .audio-player {
+            background: #333;
+            color: #e0e0e0;
+        }
+
+        body.dark-theme .surah-translation,
+        body.dark-theme .verse-translation,
+        body.dark-theme .hadith-translation {
+            color: #b0b0b0;
+        }
+
+        body.dark-theme .surah-info {
+            color: #999;
+        }
+
+        /* Theme Toggle Switch */
+        .theme-toggle {
+            position: fixed;
+            top: 20px;
+            right: 20px;
+            z-index: 1000;
+        }
+
+        .switch {
+            position: relative;
+            display: inline-block;
+            width: 140px;
+            height: 50px;
+            background: white;
+            border-radius: 25px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+            cursor: pointer;
+            transition: background 0.3s ease;
+        }
+
+        body.dark-theme .switch {
+            background: #2d2d2d;
+        }
+
+        .switch-input {
+            display: none;
+        }
+
+        .switch-slider {
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 60px;
+            height: 40px;
+            background: linear-gradient(135deg, var(--dark-green), var(--accent-teal));
+            border-radius: 20px;
+            transition: transform 0.4s cubic-bezier(0.68, -0.55, 0.265, 1.55);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            box-shadow: 0 2px 10px rgba(0, 0, 0, 0.3);
+        }
+
+        .switch-input:checked+.switch-slider {
+            transform: translateX(75px);
+        }
+
+        .switch-icon {
+            font-size: 1.3rem;
+            color: white;
+        }
+
+        .switch-label {
+            position: absolute;
+            top: 50%;
+            transform: translateY(-50%);
+            font-family: 'Times New Roman', serif;
+            font-weight: 600;
+            font-size: 0.9rem;
+            pointer-events: none;
+            transition: opacity 0.3s ease;
+        }
+
+        .light-label {
+            left: 15px;
+            color: var(--dark-green);
+            opacity: 0;
+        }
+
+        body.dark-theme .light-label {
+            color: #5fb58a;
+        }
+
+        .switch-input:not(:checked)~.light-label {
+            opacity: 1;
+        }
+
+        .dark-label {
+            right: 15px;
+            color: var(--dark-green);
+            opacity: 1;
+        }
+
+        body.dark-theme .dark-label {
+            color: #5fb58a;
+        }
+
+        .switch-input:checked~.dark-label {
+            opacity: 0;
+        }
+
+        /* Watermark */
+        .watermark {
+            background: linear-gradient(135deg, var(--dark-green), var(--accent-teal));
+            color: white;
+            padding: 1.5rem;
+            text-align: center;
+            font-size: 1rem;
+            font-weight: 600;
+            margin-top: 3rem;
+            border-top: 3px solid var(--primary-gold);
+        }
+
+        body.dark-theme .watermark {
+            background: linear-gradient(135deg, #2d5f4d, #2a9d8f);
+        }
+
+        /* Animated background particles on mouse move */
+        .particle {
+            position: fixed;
+            width: 8px;
+            height: 8px;
+            background: var(--primary-gold);
+            border-radius: 50%;
+            pointer-events: none;
+            opacity: 0;
+            transition: all 0.6s ease-out;
+            z-index: 1;
+        }
+
+        /* Islamic pattern overlay */
+        body::before {
+            content: '';
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(45deg, transparent, transparent 35px, rgba(212, 175, 55, 0.03) 35px, rgba(212, 175, 55, 0.03) 70px),
+                repeating-linear-gradient(-45deg, transparent, transparent 35px, rgba(212, 175, 55, 0.03) 35px, rgba(212, 175, 55, 0.03) 70px);
+            pointer-events: none;
+            z-index: 0;
+        }
+
+        header {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--accent-teal) 100%);
+            color: white;
+            text-align: center;
+            padding: 2.5rem 1rem;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            z-index: 10;
+            border-bottom: 3px solid var(--primary-gold);
+        }
+
+        h1 {
+            font-size: 2.5rem;
+            margin-bottom: 0.5rem;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+            letter-spacing: 1px;
+        }
+
+        .arabic-title {
+            font-size: 3rem;
+            margin-bottom: 0.5rem;
+            font-weight: bold;
+        }
+
+        .subtitle {
+            font-size: 1.1rem;
+            opacity: 0.95;
+            font-style: italic;
+        }
+
+        .container {
+            max-width: 1200px;
+            margin: 2rem auto;
+            padding: 0 1rem;
+            position: relative;
+            z-index: 10;
+        }
+
+        .search-box {
+            background: white;
+            padding: 1.5rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.1);
+            margin-bottom: 2rem;
+            border: 2px solid var(--primary-gold);
+        }
+
+        .search-input {
+            width: 100%;
+            padding: 0.8rem 1rem;
+            border: 2px solid var(--accent-teal);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-family: 'Times New Roman', serif;
+            transition: all 0.3s ease;
+        }
+
+        .search-input:focus {
+            outline: none;
+            border-color: var(--primary-gold);
+            box-shadow: 0 0 10px rgba(212, 175, 55, 0.3);
+        }
+
+        .surah-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+            gap: 1.5rem;
+            margin-bottom: 2rem;
+        }
+
+        .surah-card {
+            background: white;
+            border-radius: 12px;
+            padding: 1.5rem;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08);
+            cursor: pointer;
+            transition: all 0.3s ease;
+            border: 2px solid transparent;
+            position: relative;
+            overflow: hidden;
+        }
+
+        .surah-card::before {
+            content: '';
+            position: absolute;
+            top: -2px;
+            left: -2px;
+            right: -2px;
+            bottom: -2px;
+            background: linear-gradient(45deg, var(--primary-gold), var(--accent-teal));
+            border-radius: 12px;
+            opacity: 0;
+            transition: opacity 0.3s ease;
+            z-index: -1;
+        }
+
+        .surah-card:hover {
+            transform: translateY(-5px);
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.15);
+        }
+
+        .surah-card:hover::before {
+            opacity: 1;
+        }
+
+        .surah-card:hover {
+            border-color: transparent;
+        }
+
+        .surah-number {
+            display: inline-block;
+            width: 40px;
+            height: 40px;
+            background: var(--primary-gold);
+            color: white;
+            border-radius: 50%;
+            text-align: center;
+            line-height: 40px;
+            font-weight: bold;
+            margin-bottom: 0.8rem;
+        }
+
+        .surah-name {
+            font-size: 1.4rem;
+            font-weight: bold;
+            color: var(--dark-green);
+            margin-bottom: 0.3rem;
+        }
+
+        .surah-translation {
+            font-size: 1rem;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 0.5rem;
+        }
+
+        .surah-info {
+            font-size: 0.9rem;
+            color: #777;
+        }
+
+        .modal {
+            display: none;
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background: rgba(0, 0, 0, 0.8);
+            z-index: 1000;
+            overflow-y: auto;
+        }
+
+        .modal-content {
+            background: white;
+            max-width: 900px;
+            margin: 2rem auto;
+            border-radius: 15px;
+            box-shadow: 0 10px 50px rgba(0, 0, 0, 0.3);
+            position: relative;
+            animation: slideIn 0.4s ease;
+        }
+
+        @keyframes slideIn {
+            from {
+                opacity: 0;
+                transform: translateY(-30px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        .modal-header {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--accent-teal) 100%);
+            color: white;
+            padding: 2rem;
+            border-radius: 15px 15px 0 0;
+            position: relative;
+        }
+
+        .close-btn {
+            position: absolute;
+            top: 1rem;
+            right: 1rem;
+            font-size: 2rem;
+            color: white;
+            cursor: pointer;
+            background: none;
+            border: none;
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            transition: all 0.3s ease;
+        }
+
+        .close-btn:hover {
+            background: rgba(255, 255, 255, 0.2);
+            transform: rotate(90deg);
+        }
+
+        .modal-body {
+            padding: 2rem;
+            max-height: 60vh;
+            overflow-y: auto;
+        }
+
+        .audio-player {
+            background: var(--light-cream);
+            padding: 1.5rem;
+            border-radius: 10px;
+            margin-bottom: 2rem;
+            border: 2px solid var(--primary-gold);
+        }
+
+        audio {
+            width: 100%;
+            margin-top: 1rem;
+        }
+
+        .verse-container {
+            margin-bottom: 2rem;
+            padding: 1.5rem;
+            background: var(--light-cream);
+            border-radius: 10px;
+            border-left: 4px solid var(--primary-gold);
+            transition: all 0.3s ease;
+        }
+
+        .verse-container:hover {
+            background: #f0e9d8;
+            transform: translateX(5px);
+        }
+
+        .verse-number {
+            color: var(--primary-gold);
+            font-weight: bold;
+            font-size: 1.1rem;
+            margin-bottom: 0.8rem;
+            display: inline-block;
+        }
+
+        .verse-arabic {
+            font-size: 1.8rem;
+            line-height: 2.5;
+            text-align: right;
+            direction: rtl;
+            margin-bottom: 1rem;
+            color: var(--dark-green);
+            font-weight: 500;
+        }
+
+        .verse-translation {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            font-style: italic;
+        }
+
+        .loading {
+            text-align: center;
+            padding: 2rem;
+            font-size: 1.2rem;
+            color: var(--accent-teal);
+        }
+
+        /* Responsive Design */
+        @media (max-width: 768px) {
+            h1 {
+                font-size: 1.8rem;
+            }
+
+            .arabic-title {
+                font-size: 2.2rem;
+            }
+
+            .surah-grid {
+                grid-template-columns: 1fr;
+            }
+
+            .modal-content {
+                margin: 1rem;
+                border-radius: 10px;
+            }
+
+            .verse-arabic {
+                font-size: 1.5rem;
+                line-height: 2.2;
+            }
+
+            .modal-body {
+                padding: 1rem;
+            }
+
+            .theme-toggle {
+                top: 10px;
+                right: 10px;
+            }
+
+            .switch {
+                width: 110px;
+                height: 40px;
+            }
+
+            .switch-slider {
+                width: 48px;
+                height: 32px;
+                top: 4px;
+                left: 4px;
+            }
+
+            .switch-input:checked+.switch-slider {
+                transform: translateX(58px);
+            }
+
+            .switch-icon {
+                font-size: 1rem;
+            }
+
+            .switch-label {
+                font-size: 0.75rem;
+            }
+
+            .light-label {
+                left: 10px;
+            }
+
+            .dark-label {
+                right: 10px;
+            }
+
+            .watermark {
+                padding: 1rem;
+                font-size: 0.85rem;
+                margin-top: 2rem;
+            }
+
+            .hadith-arabic {
+                font-size: 1.3rem;
+                line-height: 2;
+            }
+
+            .hadith-translation {
+                font-size: 1rem;
+            }
+
+            .hadith-content {
+                padding: 1.5rem;
+            }
+
+            .carousel-controls {
+                flex-wrap: wrap;
+            }
+        }
+
+        @media (max-width: 480px) {
+            header {
+                padding: 1.5rem 0.5rem;
+            }
+
+            h1 {
+                font-size: 1.5rem;
+            }
+
+            .arabic-title {
+                font-size: 1.8rem;
+            }
+
+            .subtitle {
+                font-size: 0.9rem;
+            }
+
+            .verse-arabic {
+                font-size: 1.3rem;
+            }
+        }
+
+        /* Hadith Carousel Styles */
+        .hadith-carousel {
+            background: linear-gradient(135deg, var(--dark-green) 0%, var(--accent-teal) 100%);
+            padding: 2rem 1rem;
+            margin-bottom: 2rem;
+            border-radius: 15px;
+            box-shadow: 0 4px 20px rgba(0, 0, 0, 0.2);
+            position: relative;
+            overflow: hidden;
+            border: 3px solid var(--primary-gold);
+        }
+
+        .hadith-carousel::before {
+            content: '';
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            background-image:
+                repeating-linear-gradient(45deg, transparent, transparent 25px, rgba(255, 255, 255, 0.03) 25px, rgba(255, 255, 255, 0.03) 50px);
+            pointer-events: none;
+        }
+
+        .hadith-title {
+            text-align: center;
+            color: var(--primary-gold);
+            font-size: 1.5rem;
+            margin-bottom: 1.5rem;
+            font-weight: bold;
+            text-shadow: 2px 2px 4px rgba(0, 0, 0, 0.3);
+        }
+
+        .hadith-content {
+            background: rgba(255, 255, 255, 0.95);
+            padding: 2rem;
+            border-radius: 12px;
+            min-height: 200px;
+            position: relative;
+            box-shadow: 0 4px 15px rgba(0, 0, 0, 0.2);
+        }
+
+        .hadith-arabic {
+            font-size: 1.6rem;
+            line-height: 2.2;
+            text-align: right;
+            direction: rtl;
+            color: var(--dark-green);
+            margin-bottom: 1rem;
+            font-weight: 500;
+        }
+
+        .hadith-transliteration {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #2c5f4f;
+            font-style: italic;
+            margin-bottom: 1.5rem;
+            padding: 1rem;
+            background: rgba(212, 175, 55, 0.1);
+            border-radius: 8px;
+            border-left: 3px solid var(--primary-gold);
+        }
+
+        .hadith-translation {
+            font-size: 1.1rem;
+            line-height: 1.8;
+            color: #555;
+            font-style: italic;
+            margin-bottom: 1rem;
+        }
+
+        .hadith-reference {
+            font-size: 0.9rem;
+            color: var(--primary-gold);
+            font-weight: bold;
+            text-align: right;
+        }
+
+        .carousel-controls {
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            margin-top: 1.5rem;
+            gap: 1rem;
+        }
+
+        .carousel-btn {
+            background: var(--primary-gold);
+            color: white;
+            border: none;
+            padding: 0.8rem 1.5rem;
+            border-radius: 8px;
+            cursor: pointer;
+            font-size: 1rem;
+            font-family: 'Times New Roman', serif;
+            transition: all 0.3s ease;
+            box-shadow: 0 3px 10px rgba(0, 0, 0, 0.2);
+        }
+
+        .carousel-btn:hover {
+            background: #c19b2a;
+            transform: translateY(-2px);
+            box-shadow: 0 5px 15px rgba(0, 0, 0, 0.3);
+        }
+
+        .carousel-indicator {
+            color: white;
+            font-size: 1rem;
+            font-weight: bold;
+        }
+
+        /* Active verse highlighting */
+        .verse-container.active {
+            background: #ffe8b8;
+            border-left: 6px solid var(--primary-gold);
+            box-shadow: 0 4px 15px rgba(212, 175, 55, 0.3);
+            transform: translateX(8px);
+        }
+
+        @media (max-width: 768px) {
+            .hadith-arabic {
+                font-size: 1.3rem;
+                line-height: 2;
+            }
+
+            .hadith-translation {
+                font-size: 1rem;
+            }
+
+            .hadith-content {
+                padding: 1.5rem;
+            }
+
+            .carousel-controls {
+                flex-wrap: wrap;
+            }
+        }
+    </style>
+</head>
+
+<body>
+    <!-- Theme Toggle Switch -->
+    <div class="theme-toggle">
+        <label class="switch">
+            <input type="checkbox" class="switch-input" id="themeSwitch">
+            <div class="switch-slider">
+                <span class="switch-icon" id="switchIcon">☀️</span>
+            </div>
+        </label>
+    </div>
+
+    <header>
+        <div class="arabic-title">القرآن الكريم</div>
+        <h1>The Noble Quran</h1>
+        <p class="subtitle">Read, Listen, and Reflect</p>
+    </header>
+
+    <div class="container">
+        <div class="hadith-carousel">
+            <h2 class="hadith-title">Hadith of the Prophet Muhammad ﷺ</h2>
+            <div class="hadith-content" id="hadithContent">
+                <div class="hadith-arabic" id="hadithArabic"></div>
+                <div class="hadith-transliteration" id="hadithTransliteration"></div>
+                <div class="hadith-translation" id="hadithTranslation"></div>
+                <div class="hadith-reference" id="hadithReference"></div>
+            </div>
+            <div class="carousel-controls">
+                <button class="carousel-btn" onclick="previousHadith()">← Previous</button>
+                <span class="carousel-indicator" id="hadithIndicator">1 / 40</span>
+                <button class="carousel-btn" onclick="nextHadith()">Next →</button>
+            </div>
+        </div>
+
+        <div class="search-box">
+            <input type="text" class="search-input" id="searchInput"
+                placeholder="Search for a Surah by name or number...">
+        </div>
+
+        <div class="surah-grid" id="surahGrid"></div>
+    </div>
+
+    <div class="modal" id="surahModal">
+        <div class="modal-content">
+            <div class="modal-header">
+                <button class="close-btn" onclick="closeModal()">&times;</button>
+                <h2 id="modalTitle"></h2>
+                <p id="modalSubtitle"></p>
+            </div>
+            <div class="modal-body">
+                <div class="audio-player">
+                    <h3>Audio Recitation</h3>
+                    <audio id="audioPlayer" controls></audio>
+                </div>
+                <div id="versesContainer"></div>
+            </div>
+        </div>
+    </div>
+
+    <!-- Watermark Footer -->
+    <footer class="watermark">
+        Made by Mohammed Ammar Hussain
+    </footer>
+
+    <script>
+        // Theme Management with Animated Switch
+        const themeSwitch = document.getElementById('themeSwitch');
+        const switchIcon = document.getElementById('switchIcon');
+
+        // Toggle theme
+        themeSwitch.addEventListener('change', function () {
+            if (this.checked) {
+                document.body.classList.add('dark-theme');
+                switchIcon.textContent = '🌙';
+                localStorage.setItem('theme', 'dark');
+            } else {
+                document.body.classList.remove('dark-theme');
+                switchIcon.textContent = '☀️';
+                localStorage.setItem('theme', 'light');
+            }
+        });
+
+        // Load saved theme on page load
+        window.addEventListener('DOMContentLoaded', () => {
+            const savedTheme = localStorage.getItem('theme') || 'light';
+
+            if (savedTheme === 'dark') {
+                document.body.classList.add('dark-theme');
+                themeSwitch.checked = true;
+                switchIcon.textContent = '🌙';
+            } else {
+                document.body.classList.remove('dark-theme');
+                themeSwitch.checked = false;
+                switchIcon.textContent = '☀️';
+            }
+        });
+
+        // 40 Hadith Collection with Arabic and English
+        const hadiths = [
+            {
+                arabic: "إِنَّمَا الأَعْمَالُ بِالنِّيَّاتِ، وَإِنَّمَا لِكُلِّ امْرِئٍ مَا نَوَى",
+                transliteration: "Innama al-a'malu bin-niyyat, wa innama li-kulli imri'in ma nawa",
+                translation: "Actions are judged by intentions, and every person will be rewarded according to their intention.",
+                reference: "Sahih al-Bukhari 1"
+            },
+            {
+                arabic: "بُنِيَ الإِسْلاَمُ عَلَى خَمْسٍ: شَهَادَةِ أَنْ لاَ إِلَهَ إِلاَّ اللهُ وَأَنَّ مُحَمَّدًا رَسُولُ اللهِ، وَإِقَامِ الصَّلاَةِ، وَإِيتَاءِ الزَّكَاةِ، وَحَجِّ الْبَيْتِ، وَصَوْمِ رَمَضَانَ",
+                transliteration: "Buniya al-Islamu 'ala khams: shahadati an la ilaha illa Allah wa anna Muhammadan rasulullah, wa iqami as-salat, wa ita'i az-zakat, wa hajji al-bayt, wa sawmi Ramadan",
+                translation: "Islam is built upon five pillars: testifying that there is no god but Allah and Muhammad is His messenger, establishing prayer, paying charity, pilgrimage to the House, and fasting in Ramadan.",
+                reference: "Sahih al-Bukhari 8"
+            },
+            {
+                arabic: "لاَ يُؤْمِنُ أَحَدُكُمْ حَتَّى يُحِبَّ لأَخِيهِ مَا يُحِبُّ لِنَفْسِهِ",
+                transliteration: "La yu'minu ahadukum hatta yuhibba li-akhihi ma yuhibbu li-nafsihi",
+                translation: "None of you truly believes until he loves for his brother what he loves for himself.",
+                reference: "Sahih al-Bukhari 13"
+            },
+            {
+                arabic: "مَنْ كَانَ يُؤْمِنُ بِاللهِ وَالْيَوْمِ الآخِرِ فَلْيَقُلْ خَيْرًا أَوْ لِيَصْمُتْ",
+                transliteration: "Man kana yu'minu billahi wal-yawmi al-akhir falyaqul khayran aw liyasmut",
+                translation: "Whoever believes in Allah and the Last Day should speak good or remain silent.",
+                reference: "Sahih al-Bukhari 6018"
+            },
+            {
+                arabic: "الدِّينُ النَّصِيحَةُ",
+                transliteration: "Ad-dinu an-nasiha",
+                translation: "Religion is sincere advice.",
+                reference: "Sahih Muslim 55"
+            },
+            {
+                arabic: "إِنَّ اللهَ طَيِّبٌ لاَ يَقْبَلُ إِلاَّ طَيِّبًا",
+                transliteration: "Inna Allaha tayyibun la yaqbalu illa tayyiba",
+                translation: "Indeed, Allah is Pure and accepts only that which is pure.",
+                reference: "Sahih Muslim 1015"
+            },
+            {
+                arabic: "مَا نَهَيْتُكُمْ عَنْهُ فَاجْتَنِبُوهُ، وَمَا أَمَرْتُكُمْ بِهِ فَأْتُوا مِنْهُ مَا اسْتَطَعْتُمْ",
+                transliteration: "Ma nahaytukum 'anhu fajtanibuhu, wa ma amartukum bihi fa'tu minhu mastata'tum",
+                translation: "What I have forbidden you, avoid it. And what I have ordered you, do as much of it as you can.",
+                reference: "Sahih al-Bukhari 7288"
+            },
+            {
+                arabic: "الْحَلاَلُ بَيِّنٌ وَالْحَرَامُ بَيِّنٌ، وَبَيْنَهُمَا أُمُورٌ مُشْتَبِهَاتٌ",
+                transliteration: "Al-halalu bayyin wal-haramu bayyin, wa baynahuma umurun mushtabihat",
+                translation: "The lawful is clear and the unlawful is clear, and between them are doubtful matters.",
+                reference: "Sahih al-Bukhari 52"
+            },
+            {
+                arabic: "مِنْ حُسْنِ إِسْلاَمِ الْمَرْءِ تَرْكُهُ مَا لاَ يَعْنِيهِ",
+                transliteration: "Min husni islami al-mar'i tarkuhu ma la ya'nihi",
+                translation: "Part of the perfection of one's Islam is leaving that which does not concern him.",
+                reference: "Jami' at-Tirmidhi 2317"
+            },
+            {
+                arabic: "لاَ تَغْضَبْ",
+                transliteration: "La taghdab",
+                translation: "Do not become angry.",
+                reference: "Sahih al-Bukhari 6116"
+            },
+            {
+                arabic: "الْمُؤْمِنُ الْقَوِيُّ خَيْرٌ وَأَحَبُّ إِلَى اللهِ مِنَ الْمُؤْمِنِ الضَّعِيفِ",
+                transliteration: "Al-mu'minu al-qawiyyu khayrun wa ahabbu ila Allahi min al-mu'mini ad-da'if",
+                translation: "The strong believer is better and more beloved to Allah than the weak believer.",
+                reference: "Sahih Muslim 2664"
+            },
+            {
+                arabic: "ازْهَدْ فِي الدُّنْيَا يُحِبَّكَ اللهُ، وَازْهَدْ فِيمَا عِنْدَ النَّاسِ يُحِبَّكَ النَّاسُ",
+                transliteration: "Izhad fi ad-dunya yuhibbuka Allah, wa izhad fima 'inda an-nasi yuhibbuka an-nas",
+                translation: "Be indifferent to the world and Allah will love you. Be indifferent to what people possess and they will love you.",
+                reference: "Sunan Ibn Majah 4102"
+            },
+            {
+                arabic: "لاَ ضَرَرَ وَلاَ ضِرَارَ",
+                transliteration: "La darar wa la dirar",
+                translation: "There should be neither harming nor reciprocating harm.",
+                reference: "Sunan Ibn Majah 2340"
+            },
+            {
+                arabic: "الطُّهُورُ شَطْرُ الإِيمَانِ",
+                transliteration: "At-tuhuru shatru al-iman",
+                translation: "Purity is half of faith.",
+                reference: "Sahih Muslim 223"
+            },
+            {
+                arabic: "اتَّقِ اللهَ حَيْثُمَا كُنْتَ، وَأَتْبِعِ السَّيِّئَةَ الْحَسَنَةَ تَمْحُهَا، وَخَالِقِ النَّاسَ بِخُلُقٍ حَسَنٍ",
+                transliteration: "Ittaqi Allaha haythuma kunt, wa atbi' as-sayyi'ata al-hasanata tamhuha, wa khaliq an-nasa bi-khuluqin hasan",
+                translation: "Have consciousness of Allah wherever you are, and follow a bad deed with a good one to erase it, and treat people with good character.",
+                reference: "Jami' at-Tirmidhi 1987"
+            },
+            {
+                arabic: "إِنَّ اللهَ كَتَبَ الإِحْسَانَ عَلَى كُلِّ شَيْءٍ",
+                transliteration: "Inna Allaha kataba al-ihsana 'ala kulli shay'",
+                translation: "Indeed Allah has prescribed excellence in all things.",
+                reference: "Sahih Muslim 1955"
+            },
+            {
+                arabic: "مَنْ لاَ يَرْحَمُ لاَ يُرْحَمُ",
+                transliteration: "Man la yarham la yurham",
+                translation: "Whoever does not show mercy will not be shown mercy.",
+                reference: "Sahih al-Bukhari 7376"
+            },
+            {
+                arabic: "الْمُسْلِمُ مَنْ سَلِمَ الْمُسْلِمُونَ مِنْ لِسَانِهِ وَيَدِهِ",
+                transliteration: "Al-muslimu man salima al-muslimuna min lisanihi wa yadihi",
+                translation: "The Muslim is the one from whose tongue and hand the Muslims are safe.",
+                reference: "Sahih al-Bukhari 10"
+            },
+            {
+                arabic: "خَيْرُكُمْ مَنْ تَعَلَّمَ الْقُرْآنَ وَعَلَّمَهُ",
+                transliteration: "Khayru-kum man ta'allama al-Qur'ana wa 'allamahu",
+                translation: "The best among you are those who learn the Quran and teach it.",
+                reference: "Sahih al-Bukhari 5027"
+            },
+            {
+                arabic: "الصَّبْرُ ضِيَاءٌ",
+                transliteration: "As-sabru diya'",
+                translation: "Patience is illumination.",
+                reference: "Sahih Muslim 223"
+            },
+            {
+                arabic: "كُلُّ بَنِي آدَمَ خَطَّاءٌ، وَخَيْرُ الْخَطَّائِينَ التَّوَّابُونَ",
+                transliteration: "Kullu bani Adama khatta', wa khayru al-khatta'ina at-tawwabun",
+                translation: "Every son of Adam sins, and the best of the sinners are those who repent.",
+                reference: "Sunan Ibn Majah 4251"
+            },
+            {
+                arabic: "إِنَّمَا بُعِثْتُ لِأُتَمِّمَ مَكَارِمَ الأَخْلاَقِ",
+                transliteration: "Innama bu'ithtu li-utammima makarima al-akhlaq",
+                translation: "I was sent only to perfect good character.",
+                reference: "Musnad Ahmad 8595"
+            },
+            {
+                arabic: "الْكَيِّسُ مَنْ دَانَ نَفْسَهُ وَعَمِلَ لِمَا بَعْدَ الْمَوْتِ",
+                transliteration: "Al-kayyisu man dana nafsahu wa 'amila lima ba'da al-mawt",
+                translation: "The intelligent person is one who controls himself and works for what comes after death.",
+                reference: "Jami' at-Tirmidhi 2459"
+            },
+            {
+                arabic: "مَنْ حَسُنَ إِسْلاَمُهُ، كَثُرَ خَيْرُهُ",
+                transliteration: "Man hasuna islamuhu, kathura khayruhu",
+                translation: "When one's Islam is good, his goodness becomes abundant.",
+                reference: "Musnad Ahmad 16509"
+            },
+            {
+                arabic: "الْمُسْلِمُ أَخُو الْمُسْلِمِ",
+                transliteration: "Al-muslimu akhu al-muslim",
+                translation: "A Muslim is a brother to another Muslim.",
+                reference: "Sahih al-Bukhari 2442"
+            },
+            {
+                arabic: "تَهَادَوْا تَحَابُّوا",
+                transliteration: "Tahadu tahabbu",
+                translation: "Give gifts to one another and you will love one another.",
+                reference: "Al-Adab Al-Mufrad 594"
+            },
+            {
+                arabic: "الْجَنَّةُ تَحْتَ أَقْدَامِ الأُمَّهَاتِ",
+                transliteration: "Al-jannatu tahta aqdami al-ummahat",
+                translation: "Paradise lies under the feet of mothers.",
+                reference: "Musnad Ahmad 13604"
+            },
+            {
+                arabic: "خَيْرُ النَّاسِ أَنْفَعُهُمْ لِلنَّاسِ",
+                transliteration: "Khayru an-nasi anfa'uhum lin-nas",
+                translation: "The best of people are those who are most beneficial to others.",
+                reference: "Al-Mu'jam al-Awsat 5787"
+            },
+            {
+                arabic: "إِنَّ اللهَ يُحِبُّ إِذَا عَمِلَ أَحَدُكُمْ عَمَلاً أَنْ يُتْقِنَهُ",
+                transliteration: "Inna Allaha yuhibbu idha 'amila ahadukum 'amalan an yutqinahu",
+                translation: "Indeed Allah loves that when one of you does something, he perfects it.",
+                reference: "Al-Mu'jam al-Awsat 1113"
+            },
+            {
+                arabic: "تَبَسُّمُكَ فِي وَجْهِ أَخِيكَ صَدَقَةٌ",
+                transliteration: "Tabasumuka fi wajhi akhika sadaqah",
+                translation: "Your smile in the face of your brother is charity.",
+                reference: "Jami' at-Tirmidhi 1956"
+            },
+            {
+                arabic: "لَيْسَ الْغِنَى عَنْ كَثْرَةِ الْعَرَضِ، وَلَكِنَّ الْغِنَى غِنَى النَّفْسِ",
+                transliteration: "Laysa al-ghina 'an kathrati al-'arad, wa lakinna al-ghina ghina an-nafs",
+                translation: "Richness is not having many possessions, but richness is contentment of the soul.",
+                reference: "Sahih al-Bukhari 6446"
+            },
+            {
+                arabic: "مَنْ صَلَّى عَلَيَّ صَلاَةً صَلَّى اللهُ عَلَيْهِ بِهَا عَشْرًا",
+                transliteration: "Man salla 'alayya salatan salla Allahu 'alayhi biha 'ashran",
+                translation: "Whoever sends blessings upon me once, Allah will send blessings upon him ten times.",
+                reference: "Sahih Muslim 408"
+            },
+            {
+                arabic: "إِنَّ مِنْ أَحَبِّكُمْ إِلَيَّ وَأَقْرَبِكُمْ مِنِّي مَجْلِسًا يَوْمَ الْقِيَامَةِ أَحَاسِنَكُمْ أَخْلاَقًا",
+                transliteration: "Inna min ahabikum ilayya wa aqrabikum minni majlisan yawma al-qiyamati ahasinukum akhlaqan",
+                translation: "The most beloved to me among you and the closest to me on the Day of Resurrection are those with the best character.",
+                reference: "Jami' at-Tirmidhi 2018"
+            },
+            {
+                arabic: "اللَّهُمَّ إِنِّي أَعُوذُ بِكَ مِنْ عِلْمٍ لاَ يَنْفَعُ",
+                transliteration: "Allahumma inni a'udhu bika min 'ilmin la yanfa'",
+                translation: "O Allah, I seek refuge in You from knowledge that does not benefit.",
+                reference: "Sahih Muslim 2722"
+            },
+            {
+                arabic: "مَنْ صَامَ رَمَضَانَ إِيمَانًا وَاحْتِسَابًا غُفِرَ لَهُ مَا تَقَدَّمَ مِنْ ذَنْبِهِ",
+                transliteration: "Man sama Ramadana imanan wahtisaban ghufira lahu ma taqaddama min dhanbihi",
+                translation: "Whoever fasts Ramadan with faith and seeking reward, his past sins will be forgiven.",
+                reference: "Sahih al-Bukhari 38"
+            },
+            {
+                arabic: "الدُّعَاءُ هُوَ الْعِبَادَةُ",
+                transliteration: "Ad-du'a huwa al-'ibadah",
+                translation: "Supplication is worship.",
+                reference: "Jami' at-Tirmidhi 3372"
+            },
+            {
+                arabic: "أَحَبُّ الأَعْمَالِ إِلَى اللهِ أَدْوَمُهَا وَإِنْ قَلَّ",
+                transliteration: "Ahabbu al-a'mali ila Allahi adwamuha wa in qall",
+                translation: "The most beloved deeds to Allah are those done consistently, even if they are small.",
+                reference: "Sahih al-Bukhari 6464"
+            },
+            {
+                arabic: "مَنْ قَالَ سُبْحَانَ اللهِ وَبِحَمْدِهِ فِي يَوْمٍ مِائَةَ مَرَّةٍ حُطَّتْ خَطَايَاهُ وَإِنْ كَانَتْ مِثْلَ زَبَدِ الْبَحْرِ",
+                transliteration: "Man qala subhanallahi wa bihamdihi fi yawmin mi'ata marratin huttat khataayahu wa in kanat mithla zabadi al-bahr",
+                translation: "Whoever says 'Glory be to Allah and praise be to Him' one hundred times a day, his sins will be forgiven even if they are like the foam of the sea.",
+                reference: "Sahih al-Bukhari 6405"
+            },
+            {
+                arabic: "الْمُؤْمِنُ لِلْمُؤْمِنِ كَالْبُنْيَانِ يَشُدُّ بَعْضُهُ بَعْضًا",
+                transliteration: "Al-mu'minu lil-mu'mini kal-bunyani yashudu ba'duhu ba'dan",
+                translation: "The believer to another believer is like a building, each part strengthening the other.",
+                reference: "Sahih al-Bukhari 481"
+            },
+            {
+                arabic: "مَنْ سَتَرَ مُسْلِمًا سَتَرَهُ اللهُ يَوْمَ الْقِيَامَةِ",
+                transliteration: "Man satara musliman satarahu Allahu yawma al-qiyamah",
+                translation: "Whoever covers the faults of a Muslim, Allah will cover his faults on the Day of Resurrection.",
+                reference: "Sahih Muslim 2590"
+            }
+        ];
+
+        let currentHadithIndex = 0;
+        let hadithAutoPlay = null;
+
+        // Display Hadith
+        function displayHadith(index) {
+            const hadith = hadiths[index];
+            document.getElementById('hadithArabic').textContent = hadith.arabic;
+            document.getElementById('hadithTransliteration').textContent = hadith.transliteration;
+            document.getElementById('hadithTranslation').textContent = hadith.translation;
+            document.getElementById('hadithReference').textContent = hadith.reference;
+            document.getElementById('hadithIndicator').textContent = `${index + 1} / 40`;
+        }
+
+        // Next Hadith
+        function nextHadith() {
+            currentHadithIndex = (currentHadithIndex + 1) % hadiths.length;
+            displayHadith(currentHadithIndex);
+        }
+
+        // Previous Hadith
+        function previousHadith() {
+            currentHadithIndex = (currentHadithIndex - 1 + hadiths.length) % hadiths.length;
+            displayHadith(currentHadithIndex);
+        }
+
+        // Initialize first hadith and start auto-play
+        displayHadith(0);
+        hadithAutoPlay = setInterval(nextHadith, 8000); // Auto-play every 8 seconds
+
+
+        // Surah data with all 114 surahs
+        const surahs = [
+            { number: 1, name: "Al-Fatihah", translation: "The Opening", verses: 7, revelation: "Meccan" },
+            { number: 2, name: "Al-Baqarah", translation: "The Cow", verses: 286, revelation: "Medinan" },
+            { number: 3, name: "Ali 'Imran", translation: "Family of Imran", verses: 200, revelation: "Medinan" },
+            { number: 4, name: "An-Nisa", translation: "The Women", verses: 176, revelation: "Medinan" },
+            { number: 5, name: "Al-Ma'idah", translation: "The Table Spread", verses: 120, revelation: "Medinan" },
+            { number: 6, name: "Al-An'am", translation: "The Cattle", verses: 165, revelation: "Meccan" },
+            { number: 7, name: "Al-A'raf", translation: "The Heights", verses: 206, revelation: "Meccan" },
+            { number: 8, name: "Al-Anfal", translation: "The Spoils of War", verses: 75, revelation: "Medinan" },
+            { number: 9, name: "At-Tawbah", translation: "The Repentance", verses: 129, revelation: "Medinan" },
+            { number: 10, name: "Yunus", translation: "Jonah", verses: 109, revelation: "Meccan" },
+            { number: 11, name: "Hud", translation: "Hud", verses: 123, revelation: "Meccan" },
+            { number: 12, name: "Yusuf", translation: "Joseph", verses: 111, revelation: "Meccan" },
+            { number: 13, name: "Ar-Ra'd", translation: "The Thunder", verses: 43, revelation: "Medinan" },
+            { number: 14, name: "Ibrahim", translation: "Abraham", verses: 52, revelation: "Meccan" },
+            { number: 15, name: "Al-Hijr", translation: "The Rocky Tract", verses: 99, revelation: "Meccan" },
+            { number: 16, name: "An-Nahl", translation: "The Bee", verses: 128, revelation: "Meccan" },
+            { number: 17, name: "Al-Isra", translation: "The Night Journey", verses: 111, revelation: "Meccan" },
+            { number: 18, name: "Al-Kahf", translation: "The Cave", verses: 110, revelation: "Meccan" },
+            { number: 19, name: "Maryam", translation: "Mary", verses: 98, revelation: "Meccan" },
+            { number: 20, name: "Taha", translation: "Ta-Ha", verses: 135, revelation: "Meccan" },
+            { number: 21, name: "Al-Anbya", translation: "The Prophets", verses: 112, revelation: "Meccan" },
+            { number: 22, name: "Al-Hajj", translation: "The Pilgrimage", verses: 78, revelation: "Medinan" },
+            { number: 23, name: "Al-Mu'minun", translation: "The Believers", verses: 118, revelation: "Meccan" },
+            { number: 24, name: "An-Nur", translation: "The Light", verses: 64, revelation: "Medinan" },
+            { number: 25, name: "Al-Furqan", translation: "The Criterion", verses: 77, revelation: "Meccan" },
+            { number: 26, name: "Ash-Shu'ara", translation: "The Poets", verses: 227, revelation: "Meccan" },
+            { number: 27, name: "An-Naml", translation: "The Ant", verses: 93, revelation: "Meccan" },
+            { number: 28, name: "Al-Qasas", translation: "The Stories", verses: 88, revelation: "Meccan" },
+            { number: 29, name: "Al-'Ankabut", translation: "The Spider", verses: 69, revelation: "Meccan" },
+            { number: 30, name: "Ar-Rum", translation: "The Romans", verses: 60, revelation: "Meccan" },
+            { number: 31, name: "Luqman", translation: "Luqman", verses: 34, revelation: "Meccan" },
+            { number: 32, name: "As-Sajdah", translation: "The Prostration", verses: 30, revelation: "Meccan" },
+            { number: 33, name: "Al-Ahzab", translation: "The Combined Forces", verses: 73, revelation: "Medinan" },
+            { number: 34, name: "Saba", translation: "Sheba", verses: 54, revelation: "Meccan" },
+            { number: 35, name: "Fatir", translation: "Originator", verses: 45, revelation: "Meccan" },
+            { number: 36, name: "Ya-Sin", translation: "Ya Sin", verses: 83, revelation: "Meccan" },
+            { number: 37, name: "As-Saffat", translation: "Those who set the Ranks", verses: 182, revelation: "Meccan" },
+            { number: 38, name: "Sad", translation: "The Letter Sad", verses: 88, revelation: "Meccan" },
+            { number: 39, name: "Az-Zumar", translation: "The Troops", verses: 75, revelation: "Meccan" },
+            { number: 40, name: "Ghafir", translation: "The Forgiver", verses: 85, revelation: "Meccan" },
+            { number: 41, name: "Fussilat", translation: "Explained in Detail", verses: 54, revelation: "Meccan" },
+            { number: 42, name: "Ash-Shuraa", translation: "The Consultation", verses: 53, revelation: "Meccan" },
+            { number: 43, name: "Az-Zukhruf", translation: "The Ornaments of Gold", verses: 89, revelation: "Meccan" },
+            { number: 44, name: "Ad-Dukhan", translation: "The Smoke", verses: 59, revelation: "Meccan" },
+            { number: 45, name: "Al-Jathiyah", translation: "The Crouching", verses: 37, revelation: "Meccan" },
+            { number: 46, name: "Al-Ahqaf", translation: "The Wind-Curved Sandhills", verses: 35, revelation: "Meccan" },
+            { number: 47, name: "Muhammad", translation: "Muhammad", verses: 38, revelation: "Medinan" },
+            { number: 48, name: "Al-Fath", translation: "The Victory", verses: 29, revelation: "Medinan" },
+            { number: 49, name: "Al-Hujurat", translation: "The Rooms", verses: 18, revelation: "Medinan" },
+            { number: 50, name: "Qaf", translation: "The Letter Qaf", verses: 45, revelation: "Meccan" },
+            { number: 51, name: "Adh-Dhariyat", translation: "The Winnowing Winds", verses: 60, revelation: "Meccan" },
+            { number: 52, name: "At-Tur", translation: "The Mount", verses: 49, revelation: "Meccan" },
+            { number: 53, name: "An-Najm", translation: "The Star", verses: 62, revelation: "Meccan" },
+            { number: 54, name: "Al-Qamar", translation: "The Moon", verses: 55, revelation: "Meccan" },
+            { number: 55, name: "Ar-Rahman", translation: "The Beneficent", verses: 78, revelation: "Medinan" },
+            { number: 56, name: "Al-Waqi'ah", translation: "The Inevitable", verses: 96, revelation: "Meccan" },
+            { number: 57, name: "Al-Hadid", translation: "The Iron", verses: 29, revelation: "Medinan" },
+            { number: 58, name: "Al-Mujadila", translation: "The Pleading Woman", verses: 22, revelation: "Medinan" },
+            { number: 59, name: "Al-Hashr", translation: "The Exile", verses: 24, revelation: "Medinan" },
+            { number: 60, name: "Al-Mumtahanah", translation: "She that is to be examined", verses: 13, revelation: "Medinan" },
+            { number: 61, name: "As-Saf", translation: "The Ranks", verses: 14, revelation: "Medinan" },
+            { number: 62, name: "Al-Jumu'ah", translation: "The Congregation", verses: 11, revelation: "Medinan" },
+            { number: 63, name: "Al-Munafiqun", translation: "The Hypocrites", verses: 11, revelation: "Medinan" },
+            { number: 64, name: "At-Taghabun", translation: "The Mutual Disillusion", verses: 18, revelation: "Medinan" },
+            { number: 65, name: "At-Talaq", translation: "The Divorce", verses: 12, revelation: "Medinan" },
+            { number: 66, name: "At-Tahrim", translation: "The Prohibition", verses: 12, revelation: "Medinan" },
+            { number: 67, name: "Al-Mulk", translation: "The Sovereignty", verses: 30, revelation: "Meccan" },
+            { number: 68, name: "Al-Qalam", translation: "The Pen", verses: 52, revelation: "Meccan" },
+            { number: 69, name: "Al-Haqqah", translation: "The Reality", verses: 52, revelation: "Meccan" },
+            { number: 70, name: "Al-Ma'arij", translation: "The Ascending Stairways", verses: 44, revelation: "Meccan" },
+            { number: 71, name: "Nuh", translation: "Noah", verses: 28, revelation: "Meccan" },
+            { number: 72, name: "Al-Jinn", translation: "The Jinn", verses: 28, revelation: "Meccan" },
+            { number: 73, name: "Al-Muzzammil", translation: "The Enshrouded One", verses: 20, revelation: "Meccan" },
+            { number: 74, name: "Al-Muddaththir", translation: "The Cloaked One", verses: 56, revelation: "Meccan" },
+            { number: 75, name: "Al-Qiyamah", translation: "The Resurrection", verses: 40, revelation: "Meccan" },
+            { number: 76, name: "Al-Insan", translation: "The Man", verses: 31, revelation: "Medinan" },
+            { number: 77, name: "Al-Mursalat", translation: "The Emissaries", verses: 50, revelation: "Meccan" },
+            { number: 78, name: "An-Naba", translation: "The Tidings", verses: 40, revelation: "Meccan" },
+            { number: 79, name: "An-Nazi'at", translation: "Those who drag forth", verses: 46, revelation: "Meccan" },
+            { number: 80, name: "Abasa", translation: "He Frowned", verses: 42, revelation: "Meccan" },
+            { number: 81, name: "At-Takwir", translation: "The Overthrowing", verses: 29, revelation: "Meccan" },
+            { number: 82, name: "Al-Infitar", translation: "The Cleaving", verses: 19, revelation: "Meccan" },
+            { number: 83, name: "Al-Mutaffifin", translation: "The Defrauding", verses: 36, revelation: "Meccan" },
+            { number: 84, name: "Al-Inshiqaq", translation: "The Sundering", verses: 25, revelation: "Meccan" },
+            { number: 85, name: "Al-Buruj", translation: "The Mansions of the Stars", verses: 22, revelation: "Meccan" },
+            { number: 86, name: "At-Tariq", translation: "The Nightcommer", verses: 17, revelation: "Meccan" },
+            { number: 87, name: "Al-A'la", translation: "The Most High", verses: 19, revelation: "Meccan" },
+            { number: 88, name: "Al-Ghashiyah", translation: "The Overwhelming", verses: 26, revelation: "Meccan" },
+            { number: 89, name: "Al-Fajr", translation: "The Dawn", verses: 30, revelation: "Meccan" },
+            { number: 90, name: "Al-Balad", translation: "The City", verses: 20, revelation: "Meccan" },
+            { number: 91, name: "Ash-Shams", translation: "The Sun", verses: 15, revelation: "Meccan" },
+            { number: 92, name: "Al-Layl", translation: "The Night", verses: 21, revelation: "Meccan" },
+            { number: 93, name: "Ad-Duhaa", translation: "The Morning Hours", verses: 11, revelation: "Meccan" },
+            { number: 94, name: "Ash-Sharh", translation: "The Relief", verses: 8, revelation: "Meccan" },
+            { number: 95, name: "At-Tin", translation: "The Fig", verses: 8, revelation: "Meccan" },
+            { number: 96, name: "Al-'Alaq", translation: "The Clot", verses: 19, revelation: "Meccan" },
+            { number: 97, name: "Al-Qadr", translation: "The Power", verses: 5, revelation: "Meccan" },
+            { number: 98, name: "Al-Bayyinah", translation: "The Clear Proof", verses: 8, revelation: "Medinan" },
+            { number: 99, name: "Az-Zalzalah", translation: "The Earthquake", verses: 8, revelation: "Medinan" },
+            { number: 100, name: "Al-'Adiyat", translation: "The Chargers", verses: 11, revelation: "Meccan" },
+            { number: 101, name: "Al-Qari'ah", translation: "The Calamity", verses: 11, revelation: "Meccan" },
+            { number: 102, name: "At-Takathur", translation: "The Rivalry in world increase", verses: 8, revelation: "Meccan" },
+            { number: 103, name: "Al-'Asr", translation: "The Declining Day", verses: 3, revelation: "Meccan" },
+            { number: 104, name: "Al-Humazah", translation: "The Traducer", verses: 9, revelation: "Meccan" },
+            { number: 105, name: "Al-Fil", translation: "The Elephant", verses: 5, revelation: "Meccan" },
+            { number: 106, name: "Quraysh", translation: "Quraysh", verses: 4, revelation: "Meccan" },
+            { number: 107, name: "Al-Ma'un", translation: "The Small kindnesses", verses: 7, revelation: "Meccan" },
+            { number: 108, name: "Al-Kawthar", translation: "The Abundance", verses: 3, revelation: "Meccan" },
+            { number: 109, name: "Al-Kafirun", translation: "The Disbelievers", verses: 6, revelation: "Meccan" },
+            { number: 110, name: "An-Nasr", translation: "The Divine Support", verses: 3, revelation: "Medinan" },
+            { number: 111, name: "Al-Masad", translation: "The Palm Fiber", verses: 5, revelation: "Meccan" },
+            { number: 112, name: "Al-Ikhlas", translation: "The Sincerity", verses: 4, revelation: "Meccan" },
+            { number: 113, name: "Al-Falaq", translation: "The Daybreak", verses: 5, revelation: "Meccan" },
+            { number: 114, name: "An-Nas", translation: "Mankind", verses: 6, revelation: "Meccan" }
+        ];
+
+        // Mouse movement animation
+        let particles = [];
+        document.addEventListener('mousemove', (e) => {
+            if (Math.random() > 0.85) {
+                const particle = document.createElement('div');
+                particle.className = 'particle';
+                particle.style.left = e.clientX + 'px';
+                particle.style.top = e.clientY + 'px';
+                document.body.appendChild(particle);
+
+                setTimeout(() => {
+                    particle.style.opacity = '0.7';
+                    particle.style.transform = `translate(${Math.random() * 100 - 50}px, ${Math.random() * 100 - 50}px) scale(0)`;
+                }, 10);
+
+                setTimeout(() => {
+                    particle.remove();
+                }, 600);
+            }
+        });
+
+        // Render surahs
+        function renderSurahs(surahsToRender) {
+            const grid = document.getElementById('surahGrid');
+            grid.innerHTML = '';
+
+            surahsToRender.forEach(surah => {
+                const card = document.createElement('div');
+                card.className = 'surah-card';
+                card.innerHTML = `
+                    <div class="surah-number">${surah.number}</div>
+                    <div class="surah-name">${surah.name}</div>
+                    <div class="surah-translation">${surah.translation}</div>
+                    <div class="surah-info">${surah.verses} verses • ${surah.revelation}</div>
+                `;
+                card.onclick = () => openSurah(surah);
+                grid.appendChild(card);
+            });
+        }
+
+        // Search functionality
+        document.getElementById('searchInput').addEventListener('input', (e) => {
+            const searchTerm = e.target.value.toLowerCase();
+            const filtered = surahs.filter(surah =>
+                surah.name.toLowerCase().includes(searchTerm) ||
+                surah.translation.toLowerCase().includes(searchTerm) ||
+                surah.number.toString().includes(searchTerm)
+            );
+            renderSurahs(filtered);
+        });
+
+        // Open surah modal
+        let currentAudioData = null;
+        let verseTimings = [];
+        let verseTexts = [];
+
+        async function openSurah(surah) {
+            const modal = document.getElementById('surahModal');
+            document.getElementById('modalTitle').textContent = `${surah.number}. ${surah.name}`;
+            document.getElementById('modalSubtitle').textContent = surah.translation;
+
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.src = `https://cdn.islamic.network/quran/audio-surah/128/ar.alafasy/${surah.number}.mp3`;
+
+            const versesContainer = document.getElementById('versesContainer');
+            versesContainer.innerHTML = '<div class="loading">Loading verses...</div>';
+
+            modal.style.display = 'block';
+
+            // Reset verse timings
+            verseTimings = [];
+            verseTexts = [];
+
+            // Fetch verses from API
+            try {
+                const response = await fetch(`https://api.alquran.cloud/v1/surah/${surah.number}/editions/quran-uthmani,en.sahih`);
+                const data = await response.json();
+
+                versesContainer.innerHTML = '';
+                const arabicVerses = data.data[0].ayahs;
+                const translationVerses = data.data[1].ayahs;
+
+                // Bismillah text
+                const bismillah = 'بِسْمِ ٱللَّهِ ٱلرَّحْمَٰنِ ٱلرَّحِيمِ';
+                const bismillahTranslation = 'In the name of Allah, the Most Gracious, the Most Merciful';
+
+                // Add Bismillah for all surahs except Surah 1 (Al-Fatihah, where it's verse 1) and Surah 9 (At-Tawbah, which doesn't have Bismillah)
+                const shouldAddBismillah = surah.number !== 1 && surah.number !== 9;
+
+                currentAudioData = {
+                    totalVerses: arabicVerses.length,
+                    currentVerse: shouldAddBismillah ? -1 : 0,
+                    hasBismillah: shouldAddBismillah
+                };
+
+                // Store verse texts for timing calculation (include Bismillah if applicable)
+                if (shouldAddBismillah) {
+                    verseTexts = [bismillah, ...arabicVerses.map(verse => verse.text)];
+                } else {
+                    verseTexts = arabicVerses.map(verse => verse.text);
+                }
+
+                // Add Bismillah display if applicable
+                if (shouldAddBismillah) {
+                    const bismillahDiv = document.createElement('div');
+                    bismillahDiv.className = 'verse-container';
+                    bismillahDiv.id = 'verse--1'; // Use -1 for Bismillah
+                    bismillahDiv.innerHTML = `
+                        <div class="verse-number">Bismillah</div>
+                        <div class="verse-arabic">${bismillah}</div>
+                        <div class="verse-translation">${bismillahTranslation}</div>
+                    `;
+                    versesContainer.appendChild(bismillahDiv);
+                }
+
+                arabicVerses.forEach((verse, index) => {
+                    const verseDiv = document.createElement('div');
+                    verseDiv.className = 'verse-container';
+                    verseDiv.id = `verse-${index}`;
+                    verseDiv.innerHTML = `
+                        <div class="verse-number">Verse ${verse.numberInSurah}</div>
+                        <div class="verse-arabic">${verse.text}</div>
+                        <div class="verse-translation">${translationVerses[index].text}</div>
+                    `;
+                    versesContainer.appendChild(verseDiv);
+                });
+
+                // Setup audio event listeners for synchronization
+                audioPlayer.removeEventListener('timeupdate', handleAudioTimeUpdate);
+                audioPlayer.addEventListener('timeupdate', handleAudioTimeUpdate);
+                audioPlayer.removeEventListener('loadedmetadata', handleAudioLoaded);
+                audioPlayer.addEventListener('loadedmetadata', handleAudioLoaded);
+                audioPlayer.removeEventListener('pause', handleAudioPause);
+                audioPlayer.addEventListener('pause', handleAudioPause);
+
+            } catch (error) {
+                versesContainer.innerHTML = '<div class="loading">Error loading verses. Please try again.</div>';
+            }
+        }
+
+        // Handle audio metadata loaded - calculate verse timings based on verse length
+        function handleAudioLoaded(e) {
+            const audioPlayer = e.target;
+            if (currentAudioData && audioPlayer.duration && !isNaN(audioPlayer.duration) && verseTexts.length > 0) {
+                const totalDuration = audioPlayer.duration;
+                const totalVerses = currentAudioData.totalVerses;
+
+                // Calculate total character count across all verses
+                const verseLengths = verseTexts.map(text => text.length);
+                const totalCharacters = verseLengths.reduce((sum, len) => sum + len, 0);
+
+                // Distribute time proportionally based on verse length
+                verseTimings = [];
+                let currentTime = 0;
+
+                // If Bismillah is included, we need to account for it in timing
+                const totalItems = verseTexts.length; // This includes Bismillah if present
+
+                for (let i = 0; i < totalItems; i++) {
+                    const verseRatio = verseLengths[i] / totalCharacters;
+                    const verseDuration = totalDuration * verseRatio;
+
+                    // Adjust index for Bismillah: if Bismillah exists, index -1 is Bismillah, 0+ are actual verses
+                    const verseIndex = currentAudioData.hasBismillah ? i - 1 : i;
+
+                    verseTimings.push({
+                        verseIndex: verseIndex,
+                        startTime: currentTime,
+                        endTime: currentTime + verseDuration
+                    });
+
+                    currentTime += verseDuration;
+                }
+
+                console.log('Verse timings calculated based on verse length:', verseTimings.length, 'verses');
+            }
+        }
+
+        // Handle audio time updates for verse synchronization
+        function handleAudioTimeUpdate(e) {
+            const audioPlayer = e.target;
+
+            if (!currentAudioData || verseTimings.length === 0) {
+                return;
+            }
+
+            const currentTime = audioPlayer.currentTime;
+
+            // Find which verse should be active based on current time
+            let activeVerseIndex = null;
+            for (let i = 0; i < verseTimings.length; i++) {
+                if (currentTime >= verseTimings[i].startTime && currentTime < verseTimings[i].endTime) {
+                    activeVerseIndex = verseTimings[i].verseIndex; // Use the verseIndex from timing object
+                    break;
+                }
+            }
+
+            // If we're at the last verse and past its calculated end time
+            if (activeVerseIndex === null && currentTime >= verseTimings[verseTimings.length - 1].startTime) {
+                activeVerseIndex = verseTimings[verseTimings.length - 1].verseIndex;
+            }
+
+            // Only update if the verse has changed
+            if (activeVerseIndex !== null && activeVerseIndex !== currentAudioData.currentVerse) {
+                currentAudioData.currentVerse = activeVerseIndex;
+
+                // Remove active class from all verses
+                document.querySelectorAll('.verse-container').forEach(v => v.classList.remove('active'));
+
+                // Add active class to current verse (activeVerseIndex can be -1 for Bismillah)
+                const currentVerse = document.getElementById(`verse-${activeVerseIndex}`);
+                if (currentVerse) {
+                    currentVerse.classList.add('active');
+
+                    // Scroll to current verse smoothly
+                    currentVerse.scrollIntoView({
+                        behavior: 'smooth',
+                        block: 'center'
+                    });
+
+                    const displayIndex = activeVerseIndex === -1 ? 'Bismillah' : `Verse ${activeVerseIndex + 1}`;
+                    console.log('Active:', displayIndex);
+                }
+            }
+        }
+
+        // Handle audio pause - keep the highlight
+        function handleAudioPause(e) {
+            // Don't remove highlighting when paused
+        }
+
+        // Close modal
+        function closeModal() {
+            const modal = document.getElementById('surahModal');
+            modal.style.display = 'none';
+            const audioPlayer = document.getElementById('audioPlayer');
+            audioPlayer.pause();
+
+            // Clean up
+            currentAudioData = null;
+            verseTimings = [];
+
+            // Remove active class from all verses
+            document.querySelectorAll('.verse-container').forEach(v => v.classList.remove('active'));
+        }
+
+        // Close modal when clicking outside
+        window.onclick = (event) => {
+            const modal = document.getElementById('surahModal');
+            if (event.target === modal) {
+                closeModal();
+            }
+        };
+
+        // Initial render
+        renderSurahs(surahs);
+    </script>
+</body>
+
+</html>
